@@ -1,16 +1,17 @@
-= contextualize
+h1. contextualize
 
 Adds the ability to add and remove specific modules to an object depending on the current context
-This can fx be used for Models in a MVC pattern, where the model could have different behavior 
-depending on the context it operates in, fx if is currently accessed in a View or a Controller, or
+This can fx be used for Models in a _MVC_ pattern, where the model could have different behavior 
+depending on the context it operates in, fx if is currently accessed in a _View_ or a _Controller_, or
 even depending on the scope (fx Admin) etc. This way, a lot of the typical scenarios for helper methods
 can be avoided, and instead you simply create scope folders for the model, typically one for view and 
 possibly one for controller.
 
-http://ruby.simapse.com/2008/08/test.html
+"Decorator Pattern with Mixology":http://ruby.simapse.com/2008/08/test.html
 
 In a Rails project, you should use the following structure
 
+<pre>
 + app
   + contextualize
     project_view.rb
@@ -22,9 +23,11 @@ In a Rails project, you should use the following structure
 
 + models
     project.rb
+</pre>
 
 Define each context specific module
 
+<pre>
 module Contextualize::ProjectView
   # display the best project
   def show_best
@@ -47,18 +50,21 @@ module Contextualize
     end
   end
 end
-
+</pre>
 
 Then bind these modules to one or more contexts 
 
+<pre>
 class Project
   contextualize
   icontexts :view, :control # using naming conventions
   icontext :admin, Contextualize::Admin::ProjectView
 end
+</pre>
 
 Now you can operate on the object according to the context you are in
 
+<pre>
 project = Project.new
 
 # add :view context
@@ -88,10 +94,11 @@ lambda {project.view}.should raise_error
 project.icontext_scope :view, :control do |project|
   # ...
 end
+</pre>
 
 Enjoy!
 
-== Contributing to contextualize
+h2. Contributing to contextualize
  
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
