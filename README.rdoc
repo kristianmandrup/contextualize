@@ -5,7 +5,9 @@ This can fx be used for Models in a MVC pattern, where the model could have diff
 depending on the context it operates in, fx if is currently accessed in a View or a Controller, or
 even depending on the scope (fx Admin) etc. This way, a lot of the typical scenarios for helper methods
 can be avoided, and instead you simply create scope folders for the model, typically one for view and 
-possibly one for controller
+possibly one for controller.
+
+http://ruby.simapse.com/2008/08/test.html
 
 In a Rails project, you should use the following structure
 
