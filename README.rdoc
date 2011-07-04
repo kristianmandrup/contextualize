@@ -1,6 +1,60 @@
 = contextualize
 
-Description goes here.
+Adds the ability to add and remove specific modules to an object depending on the current context
+This can fx be used for Models in a MVC pattern, where the model could have different behavior 
+depending on the context it operates in, fx if is currently accessed in a View or a Controller, or
+even depending on the scope (fx Admin) etc. This way, a lot of the typical scenarios for helper methods
+can be avoided, and instead you simply create scope folders for the model, typically one for view and 
+possibly one for controller
+
++ models
+    project
+    + contextualize
+      project_view.rb
+      project_control.rb
+      + admin
+        project_view.rb
+
+module Contextualize::ProjectView
+  def full_name
+  end
+end
+
+module Contextualize::ProjectControl
+  def best
+  end
+end
+
+
+class Project
+  contextualize
+  icontexts :view, :control # using naming conventions
+  icontext :admin, Contextualize::Admin::ProjectView
+end
+
+project = Project.new
+
+# add :view context
+project.add_icontext :view
+
+# use the view context methods now available
+project.own_methods.should include('view')
+project.view.should == "view"
+ 
+# remove the :view context
+project.remove_icontext :view
+
+# the methods of the view context are no longer available!
+lambda {project.view}.should raise_error
+
+# operate on object within one or more contexts
+project.icontext_scope :view do |project|
+  project.view.should == "view"
+end
+
+# contexts are automatically removed from object when block terminates
+lambda {project.view}.should raise_error
+
 
 == Contributing to contextualize
  
