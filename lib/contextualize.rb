@@ -9,7 +9,12 @@ module Contextualize
 
     def icontext name, *constants
       @icontext_map ||= {}
-      @icontext_map[name.to_sym] = select_modules constants
+      context_modules = if constants.flatten.empty?
+        const_by_convention(name) 
+      else                         
+        select_modules constants
+      end
+      @icontext_map[name.to_sym] = context_modules
     end
 
     def icontexts *names
@@ -63,6 +68,7 @@ module Contextualize
   protected
 
   def icontext name 
-    icontext_map[name.to_sym] || []
+    mods = icontext_map[name.to_sym] || []
+    [mods].flatten
   end  
 end

@@ -43,8 +43,8 @@ end
 
 class Event
   contextualize
-
-  icontexts :view, :control
+  icontext  :control
+  icontexts :view
 end
 
 describe "Contextualize" do
@@ -54,7 +54,7 @@ describe "Contextualize" do
 
   it "can add a context to an object" do
     project.add_icontext :view
-    project.own_methods.should include('view')
+    project.own_methods.should include(:view)
 
     project.view.should == "view"
     project.detailed_view.should == "detailed_view"
@@ -62,7 +62,7 @@ describe "Contextualize" do
 
   it "can remove a context from an object" do
     project.add_icontext :view  
-    project.own_methods.should include('view')
+    project.own_methods.should include(:view)
 
     project.remove_icontext :view
     lambda {project.view}.should raise_error
@@ -85,9 +85,11 @@ describe "Contextualize" do
 
     it 'should apply naming conventions' do
       event.add_icontext :view
-      event.own_methods.should include('view')
-
+      event.own_methods.should include(:view)
       event.view.should == "view"
+
+      event.add_icontext :control
+      event.own_methods.should include(:control)
     end
   end
 end
