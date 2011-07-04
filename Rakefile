@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "contextualize"
   gem.homepage = "http://github.com/kristianmandrup/contextualize"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Contextual behaviors for objects for use with Rails models and many other scenarios}
+  gem.description = %Q{Add and remove behaviors defined in modules depending on context an object operates in}
   gem.email = "kmandrup@gmail.com"
   gem.authors = ["Kristian Mandrup"]
   # dependencies defined in Gemfile
