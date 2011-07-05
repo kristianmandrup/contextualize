@@ -1,27 +1,18 @@
-h1. contextualize
+h1. Contextualize
 
 Adds the ability to add and remove specific modules to an object depending on the current context
 This can fx be used for Models in a _MVC_ pattern, where the model could have different behavior 
 depending on the context it operates in, fx if is currently accessed in a _View_ or a _Controller_, or
-even depending on the scope (fx Admin) etc. This way, a lot of the typical scenarios for helper methods
-can be avoided, and instead you simply create scope folders for the model, typically one for view and 
-possibly one for controller.
+even depending on the scope (fx Admin) etc. 
 
-"Decorator Pattern with Mixology":http://ruby.simapse.com/2008/08/test.html
+This way, a lot of the typical scenarios for helper methods can be avoided. Instead you simply create 
+an 'app/contexts' folder for modules that define contextual behavior for the models. You can further
+subdivision these contexts as needed. This can even be used to redefine the logic of a method depending 
+on the context it operates in.
+                                                  
+The "Decorator Pattern with Mixology":http://ruby.simapse.com/2008/08/test.html has been used to great effect.
 
-In a Rails project, you should use the following structure
-
-<pre>
-+ app
-  + contexts
-      project_view.rb
-      project_control.rb
-    + admin
-        project_view.rb
-    
-  + models
-    project.rb
-</pre>
+h2. Basic Usage
 
 Define each context specific module
 
@@ -94,37 +85,64 @@ end
 
 h2. Usage in Rails
 
+in Gemfile
+
 <pre>
-  class ProjectsController < ApplicationController
-    # "simulated" exposure
-    def project
-      @project ||= begin
-        p = params[:id] ? Project.find(params[:id]) : Project.new(params[:project])
-        p.add_icontext :view
-      end
-    end
-    helper_method project
-    hide_action project
+gem 'contextualize'  
+</pre>
 
-    def projects
-      @projects ||= Project.all.add_icontext :view
-    end
-    helper_method projects
-    hide_action projects
+In a Rails project, you should use the following file structure
 
-    def index
-    end
-
-    def show
-    end
+<pre>
++ app
+  + contexts
+      project_view.rb
+      project_control.rb
+    + admin
+        project_view.rb
     
-    ...
-  end  
+  + models
+    project.rb
+</pre>
+
+<pre>
+class ProjectsController < ApplicationController
+  # "simulated" exposure
+  def project
+    @project ||= begin
+      p = params[:id] ? Project.find(params[:id]) : Project.new(params[:project])
+      p.add_icontext :view
+    end
+  end
+  helper_method project
+  hide_action project
+
+  def projects
+    @projects ||= Project.all.add_icontext :view
+  end
+  helper_method projects
+  hide_action projects
+
+  def index
+  end
+
+  def show
+  end
+  
+  ...
+end  
 </pre>
 
 h2. Using decent_exposure integration
 
 Contextualize monkey-patches the _#expose_ method of the _decent_exposure_ gem to add the icontext :view to each model (if present)
+
+in Gemfile
+
+<pre>
+gem 'decent_exposure'
+gem 'contextualize'  
+</pre>
        
 <pre>
 class ProjectsController < ApplicationController
@@ -165,7 +183,6 @@ class ProjectsController < ApplicationController
   end
 end
 </pre>
-
 
 Enjoy!
 
