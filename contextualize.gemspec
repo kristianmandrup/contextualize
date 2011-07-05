@@ -5,16 +5,16 @@
 
 Gem::Specification.new do |s|
   s.name = %q{contextualize}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = [%q{Kristian Mandrup}]
-  s.date = %q{2011-07-04}
+  s.date = %q{2011-07-05}
   s.description = %q{Add and remove behaviors defined in modules depending on context an object operates in}
   s.email = %q{kmandrup@gmail.com}
   s.extra_rdoc_files = [
     "LICENSE.txt",
-    "README.rdoc"
+    "README.textile"
   ]
   s.files = [
     ".document",
@@ -22,11 +22,13 @@ Gem::Specification.new do |s|
     "Gemfile",
     "Gemfile.lock",
     "LICENSE.txt",
-    "README.rdoc",
+    "README.textile",
     "Rakefile",
     "VERSION",
+    "contextualize.gemspec",
     "lib/contextualize.rb",
     "lib/contextualize/core_ext.rb",
+    "lib/contextualize/decent_exposure.rb",
     "spec/contextualize_spec.rb",
     "spec/spec_helper.rb"
   ]
