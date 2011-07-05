@@ -13,40 +13,36 @@ In a Rails project, you should use the following structure
 
 <pre>
 + app
-  + contextualize
-    project_view.rb
-    project_control.rb
-
-    + admin
+  + contexts
       project_view.rb
+      project_control.rb
+    + admin
+        project_view.rb
     
-
-+ models
+  + models
     project.rb
 </pre>
 
 Define each context specific module
 
 <pre>
-module Contextualize::ProjectView
+module ProjectView
   # display the best project
   def show_best
     # calls method :best
   end
 end
 
-module Contextualize::ProjectControl
+module ProjectControl
   # select the best project
   def best
   end
 end
 
-module Contextualize
-  module Admin
-    module ProjectControl
-      # admin specific logic to select the best project!
-      def best
-      end
+module Admin
+  module ProjectControl
+    # admin specific logic to select the best project!
+    def best
     end
   end
 end
@@ -58,7 +54,7 @@ Then bind these modules to one or more contexts
 class Project
   contextualize
   icontexts :view, :control # using naming conventions
-  icontext :admin, Contextualize::Admin::ProjectView
+  icontext :admin, Admin::ProjectControl
 end
 </pre>
 
@@ -95,6 +91,81 @@ project.icontext_scope :view, :control do |project|
   # ...
 end
 </pre>
+
+h2. Usage in Rails
+
+<pre>
+  class ProjectsController < ApplicationController
+    # "simulated" exposure
+    def project
+      @project ||= begin
+        p = params[:id] ? Project.find(params[:id]) : Project.new(params[:project])
+        p.add_icontext :view
+      end
+    end
+    helper_method project
+    hide_action project
+
+    def projects
+      @projects ||= Project.all.add_icontext :view
+    end
+    helper_method projects
+    hide_action projects
+
+    def index
+    end
+
+    def show
+    end
+    
+    ...
+  end  
+</pre>
+
+h2. Using decent_exposure integration
+
+Contextualize monkey-patches the _#expose_ method of the _decent_exposure_ gem to add the icontext :view to each model (if present)
+       
+<pre>
+class ProjectsController < ApplicationController
+  expose(:projects) { Project.all }
+  expose(:project)
+
+  def index
+  end
+
+  def show
+  end
+
+  def new
+  end
+
+  def edit
+  end
+
+  def create
+    if project.save
+      redirect_to project, notice: 'Project was successfully created.'
+    else
+      render action: "new"
+    end
+  end
+
+  def update
+    if project.update_attributes(params[:project])
+      redirect_to project, notice: 'Project was successfully updated.'
+    else
+      render action: "edit"
+    end
+  end
+
+  def destroy
+    project.destroy
+    redirect_to projects_url
+  end
+end
+</pre>
+
 
 Enjoy!
 

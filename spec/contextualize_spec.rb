@@ -1,14 +1,16 @@
 require 'spec_helper'
 
-module ProjectView
+module ProjectViewer
   def view
     "view"
   end
 end
 
-module DetailedView
-  def detailed_view
-    "detailed_view"
+module Admin
+  module ProjectDetailedView
+    def detailed_view
+      "detailed_view"
+    end
   end
 end
 
@@ -19,27 +21,26 @@ module ProjectControl
 end
 
 
-
 class Project
   contextualize
 
-  icontext :view, ProjectView, DetailedView
+  icontext :view, ProjectViewer, Admin::ProjectDetailedView
   icontext :control, ProjectControl
 end
 
-module Contextualize
-  module EventView
-    def view
-      "view"
-    end
-  end
 
-  module EventControl
-    def control
-      "control"
-    end
+module EventView
+  def view
+    "view"
   end
 end
+
+module EventControl
+  def control
+    "control"
+  end
+end
+
 
 class Event
   contextualize
@@ -50,6 +51,11 @@ end
 describe "Contextualize" do
   let (:project) do
     Project.new
+  end
+
+  it "gracefully handles adding an invalid context to an object without raising error" do
+    lambda {project.add_icontext :blip}.should_not raise_error
+    lambda {project.remove_icontext :blip}.should_not raise_error
   end
 
   it "can add a context to an object" do
@@ -76,6 +82,16 @@ describe "Contextualize" do
     end
     lambda {project.view}.should raise_error
     lambda {project.control}.should raise_error
+  end
+
+  describe 'Array extension' do
+    let (:events) do
+      [Event.new, Event.new].add_icontext :view
+    end
+
+    it 'should work on an Array instance' do
+      events.first.own_methods.should include(:view)
+    end    
   end
 
   describe 'naming conventions' do

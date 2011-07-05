@@ -1,9 +1,9 @@
 require 'mixology'
 require 'active_support/inflector'
 require 'contextualize/core_ext'
+require 'contextualize/decent_exposure'
 
 module Contextualize
-
   module ClassMethods
     attr_reader :icontext_map
 
@@ -27,7 +27,7 @@ module Contextualize
 
     def const_by_convention name
       cls_name = self.name.demodulize
-      const_name = "Contextualize::#{cls_name}#{name.to_s.camelize}"
+      const_name = "#{cls_name}#{name.to_s.camelize}"
       const_name.constantize
     end
 
@@ -46,16 +46,19 @@ module Contextualize
 
   def add_icontexts *names
     names.each {|name| add_icontext(name) }
+    self
   end
 
   def remove_icontexts *names
     names.each {|name| remove_icontext(name) }
+    self
   end
 
   def add_icontext name
     icontext(name).each do |const|
       self.send :mixin, const 
     end
+    self
   end
 
   def remove_icontext name
@@ -63,6 +66,7 @@ module Contextualize
     icontext(name).each do |const|
       self.send :unmix, const
     end
+    self
   end
 
   protected

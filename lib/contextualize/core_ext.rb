@@ -10,6 +10,16 @@ class Object
   end
 end
 
+class Array
+  def add_icontext name
+    self.each {|item| item.add_icontext name }
+  end
+
+  def remove_icontext name
+    self.each {|item| item.remove_icontext name }
+  end
+end
+
 class Module
   def contextualize
     self.send :include, Contextualize
