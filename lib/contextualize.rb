@@ -5,21 +5,21 @@ require 'contextualize/decent_exposure'
 
 module Contextualize
   module ClassMethods
-    attr_reader :icontext_map
+    attr_reader :context_map
 
-    def icontext name, *constants
-      @icontext_map ||= {}
+    def context name, *constants
+      @context_map ||= {}
       context_modules = if constants.flatten.empty?
-        const_by_convention(name) 
-      else                         
+        const_by_convention(name)
+      else
         select_modules constants
       end
-      @icontext_map[name.to_sym] = context_modules
+      @context_map[name.to_sym] = context_modules
     end
 
-    def icontexts *names
+    def contexts *names
       names.flatten.each do |name|
-        icontext name, const_by_convention(name)
+        context name, const_by_convention(name)
       end
     end
 
@@ -40,39 +40,43 @@ module Contextualize
     base.extend ClassMethods
   end
 
-  def icontext_map
-    self.class.icontext_map || {}
+  def context_map
+    self.class.context_map || {}
   end
 
-  def add_icontexts *names
-    names.each {|name| add_icontext(name) }
+  def add_contexts *names
+    names.each {|name| add_context(name) }
     self
   end
+  alias_method :enter_contexts, :add_contexts
 
-  def remove_icontexts *names
-    names.each {|name| remove_icontext(name) }
+  def remove_contexts *names
+    names.each {|name| remove_context(name) }
     self
   end
+  alias_method :exit_contexts, :remove_contexts
 
-  def add_icontext name
-    icontext(name).each do |const|
-      self.send :mixin, const 
+  def add_context name
+    context(name).each do |const|
+      self.send :mixin, const
     end
     self
   end
+  alias_method :enter_context, :add_context
 
-  def remove_icontext name
-    return if !icontext(name) || icontext(name).empty? 
-    icontext(name).each do |const|
+  def remove_context name
+    return if !context(name) || context(name).empty? 
+    context(name).each do |const|
       self.send :unmix, const
     end
     self
   end
+  alias_method :exit_context, :remove_context
 
   protected
 
-  def icontext name 
-    mods = icontext_map[name.to_sym] || []
+  def context name
+    mods = context_map[name.to_sym] || []
     [mods].flatten
-  end  
+  end
 end

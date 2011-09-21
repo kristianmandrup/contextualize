@@ -8,13 +8,12 @@ module DecentExposure
       else
         instance_exec(name, &closured_exposure)
       end
-      puts "expose contextualize"
-      @_resources[name].add_icontext :view
+      @_resources[name].add_context :view
     end
     helper_method name
     hide_action name
   end
-  
+
   alias_method :view_expose, :expose
 end
-  
+

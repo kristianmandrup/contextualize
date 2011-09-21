@@ -3,13 +3,13 @@ h1. Contextualize
 Adds the ability to add and remove specific modules to an object depending on the current context
 This can fx be used for Models in a _MVC_ pattern, where the model could have different behavior 
 depending on the context it operates in, fx if is currently accessed in a _View_ or a _Controller_, or
-even depending on the scope (fx Admin) etc. 
+even depending on the scope (fx Admin) etc.
 
 This way, a lot of the typical scenarios for helper methods can be avoided. Instead you simply create 
 an 'app/contexts' folder for modules that define contextual behavior for the models. You can further
 subdivision these contexts as needed. This can even be used to redefine the logic of a method depending 
 on the context it operates in.
-                                                  
+
 The "Decorator Pattern with Mixology":http://ruby.simapse.com/2008/08/test.html has been used to great effect.
 
 h2. Basic Usage
@@ -37,6 +37,13 @@ module Admin
     end
   end
 end
+
+# Only in order to faciliatet demonstrating results below!
+class Object
+  def own_methods
+    methods - Object.methods
+  end
+end
 </pre>
 
 Then bind these modules to one or more contexts 
@@ -44,8 +51,8 @@ Then bind these modules to one or more contexts
 <pre>
 class Project
   contextualize
-  icontexts :view, :control # using naming conventions
-  icontext :admin, Admin::ProjectControl
+  contexts :view, :control # using naming conventions
+  context :admin, Admin::ProjectControl
 end
 </pre>
 
@@ -55,30 +62,30 @@ Now you can operate on the object according to the context you are in
 project = Project.new
 
 # add :view context
-project.add_icontext :view
-project.add_icontexts :view, :control
+project.add_context :view
+project.add_contexts :view, :control
 
 # use the view context methods now available
 project.own_methods.should include('view')
 project.view.should == "view"
- 
+
 # remove the :view context
-project.remove_icontext :view
-project.remove_icontexts :view, :control
+project.remove_context :view
+project.remove_contexts :view, :control
 
 
 # the methods of the view context are no longer available!
 lambda {project.view}.should raise_error
 
 # operate on object within one or more contexts
-project.icontext_scope :view do |project|
+project.context_scope :view do |project|
   project.view.should == "view"
 end
 
 # contexts are automatically removed from object when block terminates
 lambda {project.view}.should raise_error
 
-project.icontext_scope :view, :control do |project|
+project.context_scope :view, :control do |project|
   # ...
 end
 </pre>
@@ -88,7 +95,7 @@ h2. Usage in Rails
 in Gemfile
 
 <pre>
-gem 'contextualize'  
+gem 'contextualize'
 </pre>
 
 In a Rails project, you should use the following file structure
@@ -100,7 +107,7 @@ In a Rails project, you should use the following file structure
       project_control.rb
     + admin
         project_view.rb
-    
+
   + models
     project.rb
 </pre>
@@ -128,9 +135,8 @@ class ProjectsController < ApplicationController
 
   def show
   end
-  
   ...
-end  
+end
 </pre>
 
 h2. Using decent_exposure integration
@@ -141,9 +147,9 @@ in Gemfile
 
 <pre>
 gem 'decent_exposure'
-gem 'contextualize'  
+gem 'contextualize'
 </pre>
-       
+
 <pre>
 class ProjectsController < ApplicationController
   expose(:projects) { Project.all }
@@ -187,7 +193,7 @@ end
 Enjoy!
 
 h2. Contributing to contextualize
- 
+
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
 * Fork the project
@@ -196,7 +202,7 @@ h2. Contributing to contextualize
 * Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
 * Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
 
-== Copyright
+h2. Copyright
 
 Copyright (c) 2011 Kristian Mandrup. See LICENSE.txt for
 further details.

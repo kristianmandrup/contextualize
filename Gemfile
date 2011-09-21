@@ -1,6 +1,7 @@
 source "http://rubygems.org"
 
 gem "mixology",      "~> 0.2.0"
+gem "i18n"
 gem "activesupport", ">= 3.0.1"
 
 # Add dependencies to develop your gem here.

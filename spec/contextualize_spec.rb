@@ -24,8 +24,8 @@ end
 class Project
   contextualize
 
-  icontext :view, ProjectViewer, Admin::ProjectDetailedView
-  icontext :control, ProjectControl
+  context :view, ProjectViewer, Admin::ProjectDetailedView
+  context :control, ProjectControl
 end
 
 
@@ -41,11 +41,16 @@ module EventControl
   end
 end
 
+class Object
+  def own_methods
+    methods - Object.methods
+  end
+end
 
 class Event
   contextualize
-  icontext  :control
-  icontexts :view
+  context  :control
+  contexts :view
 end
 
 describe "Contextualize" do
@@ -54,12 +59,12 @@ describe "Contextualize" do
   end
 
   it "gracefully handles adding an invalid context to an object without raising error" do
-    lambda {project.add_icontext :blip}.should_not raise_error
-    lambda {project.remove_icontext :blip}.should_not raise_error
+    lambda {project.add_context :blip}.should_not raise_error
+    lambda {project.remove_context :blip}.should_not raise_error
   end
 
   it "can add a context to an object" do
-    project.add_icontext :view
+    project.add_context :view
     project.own_methods.should include(:view)
 
     project.view.should == "view"
@@ -67,16 +72,16 @@ describe "Contextualize" do
   end
 
   it "can remove a context from an object" do
-    project.add_icontext :view  
+    project.add_context :view
     project.own_methods.should include(:view)
 
-    project.remove_icontext :view
+    project.remove_context :view
     lambda {project.view}.should raise_error
     lambda {project.detailed_view}.should raise_error
   end
 
   it 'can operate in a context scope' do
-    project.icontext_scope :view, :control do |project|
+    project.context_scope :view, :control do |project|
       project.view.should == "view"
       project.control.should == "control"
     end
@@ -86,12 +91,12 @@ describe "Contextualize" do
 
   describe 'Array extension' do
     let (:events) do
-      [Event.new, Event.new].add_icontext :view
+      [Event.new, Event.new].add_context :view
     end
 
     it 'should work on an Array instance' do
       events.first.own_methods.should include(:view)
-    end    
+    end
   end
 
   describe 'naming conventions' do
@@ -100,12 +105,15 @@ describe "Contextualize" do
     end
 
     it 'should apply naming conventions' do
-      event.add_icontext :view
+      event.enter_context :view
       event.own_methods.should include(:view)
       event.view.should == "view"
 
-      event.add_icontext :control
+      event.enter_context :control
       event.own_methods.should include(:control)
+
+      event.exit_context :control
+      event.own_methods.should_not include(:control)
     end
   end
 end
